@@ -13,3 +13,45 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Android Studio
+*.iml
+.idea/
+.gradle/
+build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Log Files
+*.log
+
+# Android Studio Navigation editor temp files
+.idea/navEditor.xml
+
+# Android Studio Captures
+/captures
+
+# IntelliJ
+*.ipr
+*.iws
+
+# Keystore files
+*.jks
+*.keystore
+
+# Google Services
+google-services.json
+
+# Bundle tool
+*.apks
+
+# Crashlytics
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+# OS-specific files
+.DS_Store
+Thumbs.db
