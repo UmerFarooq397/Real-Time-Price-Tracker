@@ -1,5 +1,6 @@
 package com.multibank.real_timepricetracker.data.websocket
 
+import android.util.Log
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -39,9 +40,12 @@ class WebSocketManager {
         if (current == ConnectionState.CONNECTED || current == ConnectionState.CONNECTING) return
 
         _connectionState.value = ConnectionState.CONNECTING
+        Log.d("WebSocketManager", "Connecting to wss://ws.postman-echo.com/raw")
+        
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
 
             override fun onOpen(webSocket: WebSocket, response: Response) {
+                Log.d("WebSocketManager", "Connection Opened")
                 _connectionState.value = ConnectionState.CONNECTED
             }
 
@@ -50,25 +54,35 @@ class WebSocketManager {
             }
 
             override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+                Log.d("WebSocketManager", "Connection Closing: $code / $reason")
                 webSocket.close(1000, null)
                 _connectionState.value = ConnectionState.DISCONNECTED
             }
 
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+                Log.d("WebSocketManager", "Connection Closed: $code / $reason")
                 _connectionState.value = ConnectionState.DISCONNECTED
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                Log.e("WebSocketManager", "Connection Failure: ${t.message}", t)
                 _connectionState.value = ConnectionState.DISCONNECTED
             }
         })
     }
 
     fun disconnect() {
+        Log.d("WebSocketManager", "Disconnecting")
         webSocket?.close(1000, "User stopped feed")
         webSocket = null
         _connectionState.value = ConnectionState.DISCONNECTED
     }
 
-    fun send(message: String): Boolean = webSocket?.send(message) ?: false
+    fun send(message: String): Boolean {
+        val sent = webSocket?.send(message) ?: false
+        if (!sent) {
+            Log.w("WebSocketManager", "Failed to send message (Socket might be closed)")
+        }
+        return sent
+    }
 }

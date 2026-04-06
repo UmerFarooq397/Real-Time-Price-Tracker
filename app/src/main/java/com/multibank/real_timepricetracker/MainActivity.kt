@@ -11,9 +11,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val app = application as RealTimePriceTrackerApplication
         setContent {
             RealTimePriceTrackerTheme {
-                AppNavigation()
+                AppNavigation(viewModelFactory = app.viewModelFactory)
             }
         }
     }

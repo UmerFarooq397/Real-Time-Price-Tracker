@@ -1,3 +1,33 @@
 <resources>
     <string name="app_name">Real-Time Price Tracker</string>
+    <string name="market_details">Market Details</string>
+    <string name="back">Back</string>
+    <string name="key_statistics">Key Statistics</string>
+    <string name="market_cap">Market Cap</string>
+    <string name="pe_ratio">P/E Ratio</string>
+    <string name="high_52w">52W High</string>
+    <string name="low_52w">52W Low</string>
+    <string name="about_the_company">About the Company</string>
+    <string name="bullish_movement">Bullish Movement</string>
+    <string name="bearish_movement">Bearish Movement</string>
+    <string name="stable">Stable</string>
+    <string name="price_tracker">Price Tracker</string>
+    <string name="start_instruction">Tap Start to begin\nreceiving live prices</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="connecting">Connecting…</string>
+    <string name="stop">Stop</string>
+    <string name="start">Start</string>
+
+    <!-- Price and Stat formats -->
+    <string name="price_format">$%1$.2f</string>
+    <string name="mock_market_cap">2.84T</string>
+    <string name="mock_pe_ratio">28.45</string>
+    <string name="mock_high_52w">199.62</string>
+    <string name="mock_low_52w">124.17</string>
+
+    <!-- Symbols -->
+    <string name="arrow_up">↑</string>
+    <string name="arrow_down">↓</string>
+    <string name="neutral_dash">–</string>
 </resources>
