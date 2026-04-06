@@ -4,7 +4,6 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -31,6 +30,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,30 +53,29 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailsScreen(
-    symbol: String,
+    viewModel: DetailsViewModel,
     onBack: () -> Unit
 ) {
-    // Design-focused Dummy Data
-    val dummyStock = remember {
-        when (symbol) {
-            "AAPL" -> StockItem("AAPL", 182.52, 181.10, PriceChange.UP)
-            "GOOG" -> StockItem("GOOG", 142.65, 143.20, PriceChange.DOWN)
-            "NVDA" -> StockItem("NVDA", 892.12, 880.00, PriceChange.UP)
-            else -> StockItem(symbol, 150.0, 150.0, PriceChange.NEUTRAL)
-        }
-    }
-    
-    val dummyDescription = "This is a detailed market overview for $symbol. It represents the current valuation and historical performance within the technology sector. Investors monitor this asset for long-term growth and stability in the evolving digital economy."
+    val uiState by viewModel.uiState.collectAsState()
+    val symbol = viewModel.symbol
+    val stock = uiState.stock ?: StockItem(symbol, 0.0, 0.0, PriceChange.NEUTRAL)
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = symbol,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Column {
+                        Text(
+                            text = symbol,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Market Details",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -87,9 +86,9 @@ fun DetailsScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
         }
@@ -100,49 +99,73 @@ fun DetailsScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // Price card with flash animation
             PriceCard(
                 symbol = symbol,
-                price = dummyStock.price,
-                change = dummyStock.change
+                price = stock.price,
+                change = stock.change
             )
 
-            // Description card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+            // Market Stats Section
+            Column {
+                Text(
+                    text = "Key Statistics",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
                 )
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "About $symbol",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = dummyDescription,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 22.sp
-                    )
+                Spacer(modifier = Modifier.height(12.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        StatRow("Market Cap", "2.84T")
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                        StatRow("P/E Ratio", "28.45")
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                        StatRow("52W High", "199.62")
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                        StatRow("52W Low", "124.17")
+                    }
                 }
+            }
+
+            // Description card
+            Column {
+                Text(
+                    text = "About the Company",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = uiState.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 24.sp
+                )
             }
         }
     }
 }
 
 @Composable
+private fun StatRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(text = value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
 private fun PriceCard(
     symbol: String,
-    price: Double?,
+    price: Double,
     change: PriceChange
 ) {
     var isFlashing by remember { mutableStateOf(false) }
@@ -158,79 +181,55 @@ private fun PriceCard(
     val flashTarget = when {
         isFlashing && change == PriceChange.UP   -> PriceUpSurface
         isFlashing && change == PriceChange.DOWN -> PriceDownSurface
-        else -> Color.Transparent
+        else -> MaterialTheme.colorScheme.surface
     }
 
     val backgroundColor by animateColorAsState(
         targetValue = flashTarget,
-        animationSpec = tween(durationMillis = 300),
+        animationSpec = tween(durationMillis = 400),
         label = "priceFlash"
     )
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(backgroundColor)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = symbol,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                if (price != null) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = "$${String.format("%.2f", price)}",
-                            style = MaterialTheme.typography.displaySmall,
-                            fontWeight = FontWeight.Bold,
-                            color = when (change) {
-                                PriceChange.UP      -> PriceUp
-                                PriceChange.DOWN    -> PriceDown
-                                PriceChange.NEUTRAL -> MaterialTheme.colorScheme.onSurface
-                            }
-                        )
-                        PriceChangeArrow(
-                            change = change,
-                            modifier = Modifier.size(28.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = when (change) {
-                            PriceChange.UP      -> "Price trending up"
-                            PriceChange.DOWN    -> "Price trending down"
-                            PriceChange.NEUTRAL -> "Price unchanged"
-                        },
-                        style = MaterialTheme.typography.labelMedium,
-                        color = when (change) {
-                            PriceChange.UP      -> PriceUp
-                            PriceChange.DOWN    -> PriceDown
-                            PriceChange.NEUTRAL -> MaterialTheme.colorScheme.onSurfaceVariant
-                        }
-                    )
-                } else {
-                    Text(
-                        text = "Waiting for data…",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+            Text(
+                text = "$${String.format("%.2f", price)}",
+                style = MaterialTheme.typography.displayMedium,
+                fontWeight = FontWeight.ExtraBold,
+                color = when (change) {
+                    PriceChange.UP      -> PriceUp
+                    PriceChange.DOWN    -> PriceDown
+                    PriceChange.NEUTRAL -> MaterialTheme.colorScheme.onSurface
                 }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                PriceChangeArrow(change = change)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = when (change) {
+                        PriceChange.UP      -> "Bullish Movement"
+                        PriceChange.DOWN    -> "Bearish Movement"
+                        PriceChange.NEUTRAL -> "Stable"
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = when (change) {
+                        PriceChange.UP      -> PriceUp
+                        PriceChange.DOWN    -> PriceDown
+                        PriceChange.NEUTRAL -> MaterialTheme.colorScheme.onSurfaceVariant
+                    }
+                )
             }
         }
     }
