@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,7 +27,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,11 +35,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.multibank.real_timepricetracker.R
 import com.multibank.real_timepricetracker.data.model.PriceChange
 import com.multibank.real_timepricetracker.data.model.StockItem
 import com.multibank.real_timepricetracker.data.websocket.ConnectionState
@@ -64,7 +64,7 @@ fun FeedScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Price Tracker",
+                        text = stringResource(R.string.price_tracker),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -96,7 +96,7 @@ fun FeedScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Tap Start to begin\nreceiving live prices",
+                    text = stringResource(R.string.start_instruction),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -134,9 +134,9 @@ private fun ConnectionIndicator(
         ConnectionState.CONNECTING   -> Color(0xFFFF9800)
     }
     val label = when (state) {
-        ConnectionState.CONNECTED    -> "Connected"
-        ConnectionState.DISCONNECTED -> "Disconnected"
-        ConnectionState.CONNECTING   -> "Connecting…"
+        ConnectionState.CONNECTED    -> stringResource(R.string.connected)
+        ConnectionState.DISCONNECTED -> stringResource(R.string.disconnected)
+        ConnectionState.CONNECTING   -> stringResource(R.string.connecting)
     }
     Row(
         modifier = modifier,
@@ -170,7 +170,7 @@ private fun FeedToggleButton(
         modifier = Modifier.padding(end = 8.dp),
         colors = ButtonDefaults.buttonColors(containerColor = containerColor)
     ) {
-        Text(text = if (isActive) "Stop" else "Start")
+        Text(text = if (isActive) stringResource(R.string.stop) else stringResource(R.string.start))
     }
 }
 
@@ -224,7 +224,7 @@ private fun StockRow(
 
         // Price
         Text(
-            text = "$${String.format("%.2f", stock.price)}",
+            text = stringResource(R.string.price_format, stock.price),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
             color = when (stock.change) {
@@ -238,10 +238,15 @@ private fun StockRow(
 
 @Composable
 fun PriceChangeArrow(change: PriceChange, modifier: Modifier = Modifier) {
-    val (arrow, color) = when (change) {
-        PriceChange.UP      -> "↑" to PriceUp
-        PriceChange.DOWN    -> "↓" to PriceDown
-        PriceChange.NEUTRAL -> "–" to MaterialTheme.colorScheme.onSurfaceVariant
+    val arrow = when (change) {
+        PriceChange.UP      -> stringResource(R.string.arrow_up)
+        PriceChange.DOWN    -> stringResource(R.string.arrow_down)
+        PriceChange.NEUTRAL -> stringResource(R.string.neutral_dash)
+    }
+    val color = when (change) {
+        PriceChange.UP      -> PriceUp
+        PriceChange.DOWN    -> PriceDown
+        PriceChange.NEUTRAL -> MaterialTheme.colorScheme.onSurfaceVariant
     }
     Text(
         text = arrow,

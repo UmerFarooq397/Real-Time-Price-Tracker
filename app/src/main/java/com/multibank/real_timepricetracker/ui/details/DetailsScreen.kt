@@ -2,7 +2,6 @@ package com.multibank.real_timepricetracker.ui.details
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,10 +36,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.multibank.real_timepricetracker.R
 import com.multibank.real_timepricetracker.data.model.PriceChange
 import com.multibank.real_timepricetracker.data.model.StockItem
 import com.multibank.real_timepricetracker.ui.feed.PriceChangeArrow
@@ -71,7 +71,7 @@ fun DetailsScreen(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Market Details",
+                            text = stringResource(R.string.market_details),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -81,7 +81,7 @@ fun DetailsScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
@@ -106,36 +106,10 @@ fun DetailsScreen(
                 price = stock.price,
                 change = stock.change
             )
-
-            // Market Stats Section
-            Column {
-                Text(
-                    text = "Key Statistics",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        StatRow("Market Cap", "2.84T")
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-                        StatRow("P/E Ratio", "28.45")
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-                        StatRow("52W High", "199.62")
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-                        StatRow("52W Low", "124.17")
-                    }
-                }
-            }
-
             // Description card
             Column {
                 Text(
-                    text = "About the Company",
+                    text = stringResource(R.string.about_the_company),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -203,7 +177,7 @@ private fun PriceCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "$${String.format("%.2f", price)}",
+                text = stringResource(R.string.price_format, price),
                 style = MaterialTheme.typography.displayMedium,
                 fontWeight = FontWeight.ExtraBold,
                 color = when (change) {
@@ -218,9 +192,9 @@ private fun PriceCard(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = when (change) {
-                        PriceChange.UP      -> "Bullish Movement"
-                        PriceChange.DOWN    -> "Bearish Movement"
-                        PriceChange.NEUTRAL -> "Stable"
+                        PriceChange.UP      -> stringResource(R.string.bullish_movement)
+                        PriceChange.DOWN    -> stringResource(R.string.bearish_movement)
+                        PriceChange.NEUTRAL -> stringResource(R.string.stable)
                     },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium,
